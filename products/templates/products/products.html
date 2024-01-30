@@ -1,0 +1,168 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    {#    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"#}
+    {#          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">#}
+
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <title>Editable Table</title>
+</head>
+<body>
+
+
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+    {#    <h5 class="my-0 mr-md-auto font-weight-normal" >Company name</h5>#}
+    <h5 class="my-0 mr-md-auto font-weight-normal">
+        <a href="{% url 'products:index' %}">Company name</a>
+    </h5>
+    <nav class="my-2 my-md-0 mr-md-3">
+        <a class="p-2 text-dark" href="#">Features</a>
+        <a class="p-2 text-dark" href="#">Enterprise</a>
+        <a class="p-2 text-dark" href="#">Support</a>
+        <a class="p-2 text-dark" href="#">Pricing</a>
+    </nav>
+    <a class="btn btn-outline-primary" href="#">Sign up</a>
+</div>
+
+
+<div class="container mt-5">
+    {#<div class="container">#}
+
+    <!-- Фильтр Диапазон цен -->
+    <div class="wrapper">
+        <header>
+            <h2>Фильтр по цене</h2>
+            {#            <p>Use slider or enter min and max price</p>#}
+        </header>
+        <div class="price-input">
+            <div class="field">
+                <span>Min</span>
+                <input type="number" class="input-min" value="{{ min_price }}">
+            </div>
+            <div class="separator">-</div>
+            <div class="field">
+                <span>Max</span>
+                <input type="number" class="input-max" value="{{ max_price }}">
+            </div>
+        </div>
+        <div class="slider">
+            <div class="progress"></div>
+        </div>
+        <div class="range-input">
+
+            <input type="range" class="range-min" min="{{ min_price }}" max="{{ max_price }}" value="{{ min_price }}"
+                   step="1">
+            <input type="range" class="range-max" min="{{ min_price }}" max="{{ max_price }}" value="{{ max_price }}"
+                   step="1">
+
+        </div>
+    </div>
+
+    <br>
+
+    <!-- Кнопка сортировка таблицы -->
+    <div class="btn-group">
+        <button type="button" class="btn btn-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            Сортировка
+        </button>
+
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" id="name">Название товара</a></li>
+            <li><a class="dropdown-item" href="#" id="category">Категория товара</a></li>
+            <li><a class="dropdown-item" href="#" id="count">Количество товара</a></li>
+            <li><a class="dropdown-item" href="#" id="weight">Вес товара</a></li>
+            <li><a class="dropdown-item" href="#" id="comment">Комментарий</a></li>
+            <li><a class="dropdown-item" href="#" id="date_create">Дата добавления</a></li>
+            <li><a class="dropdown-item" href="#" id="price">Цена</a></li>
+            {#            <li>#}
+            {#                <hr class="dropdown-divider">#}
+            {#            </li>#}
+            {#            <li><a class="dropdown-item" href="#" id="separate_link">Отделенная ссылка</a></li>#}
+        </ul>
+
+    </div>
+
+    <br><br>
+
+    <!-- Таблица -->
+    <div id="content-container">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Товар</th>
+                <th>Категория</th>
+                <th>Кол-во</th>
+                <th>Вес</th>
+                <th>Коммент</th>
+                <th>Дата добавления</th>
+                <th>Цена</th>
+                <th>Кнопка</th>
+                <th>Кнока</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td contenteditable="true" id="name_{{ product.id }}">{{ product.name }}</td>
+                    <td contenteditable="true" id="category_{{ product.id }}">{{ product.category }}</td>
+                    <td contenteditable="true" id="count_{{ product.id }}">{{ product.count }}</td>
+                    <td contenteditable="true" id="weight_{{ product.id }}">{{ product.weight }}</td>
+                    <td contenteditable="true" id="comment_{{ product.id }}">{{ product.comment }}</td>
+                    <td contenteditable="true" id="date_{{ product.id }}">{{ product.date_create }}</td>
+                    <td contenteditable="true" id="price_{{ product.id }}">{{ product.price }}</td>
+
+                    <!-- Кнопка редактир. строки в таблице, изменения сохраняются в базу данных -->
+                    <td>
+                        <button type="button" class="btn btn-success" onclick="updateRow(this,
+                                '{{ product.id }}', 'name_{{ product.id }}', 'category_{{ product.id }}', 'count_{{ product.id }}', 'weight_{{ product.id }}', 'comment_{{ product.id }}', 'date_{{ product.id }}', 'price_{{ product.id }}'
+                                )">Сохранить
+                        </button>
+                    </td>
+
+                    <!-- Кнопка удаления строки в таблице, строка удаляется из базы данных -->
+                    <td>
+                        <button type="button" class="btn btn-warning" onclick="deleteRow(this, {{ product.id }})">
+                            Удалить
+                        </button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{#Для удаления строки из таблицы и базы данных#}
+<script src="{% static 'deleteRow.js' %}"></script>
+{#Для обновления строки в таблице и базе данных#}
+<script src="{% static 'updateRow.js' %}"></script>
+{#Для изменения названия кнопки при изменении сортировки#}
+<script src="{% static 'buttonReText.js' %}"></script>
+{#Для фильтра цен#}
+<script src="{% static 'script.js' %}"></script>
+
+{#<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>#}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
